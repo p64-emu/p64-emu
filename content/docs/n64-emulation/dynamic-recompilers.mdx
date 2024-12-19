@@ -1,0 +1,37 @@
+---
+title: Dynamic Recompilers
+description: What are they? How do they work?
+---
+import { Callout } from "fumadocs-ui/components/callout"
+
+Dynamic Recompilers translate foreign machin ecode at runtime instead of compile time and benefit through being able to cache common instruction outputs to make emulation faster, very similar to how JIT (Just-In-Time) compilers work
+
+## How They Work
+They translate the code in blocks from the source language, the Nintendo 64's game code is compiled into MIPS assembly and then translated into x86 assembly for a PC
+
+The translated code blocks are then cached so they can be reused without recompilation, a huge performance gain, and you do not have to figure out how to invalidate it.
+
+Subsequent optimisations can be appplied based on the context of the execution, which can be much more efficient.
+
+## An Example?
+We can take the LUI instruction and see how LUI is built and translated to x86 assembly from MIPS assembly:
+
+<Callout title="Thank you Sarchar!">
+  The following code snippet is taken from [Sarchar's N64 Emulator](https://github.com/Sarchar/n64)
+</Callout>
+```rust
+fn build_inst_lui(&mut self, assembler: &mut Assembler) -> CompileInstructionResult {
+    trace!(target: "JIT-BUILD", "${:08X}[{:5}]: lui r{}, ${:04X}", self.current_instruction_pc as u32, self.jit_current_assembler_offset, 
+              self.inst.rt, self.inst.signed_imm as u16);
+
+    // if destination register is 0, this is a nop
+    if self.inst.rt == 0 { return CompileInstructionResult::Continue; }
+
+    // store immediate sign-extended into gpr
+    letsgo!(assembler
+        ;   mov QWORD [r_gpr + (self.inst.rt*8) as i32], DWORD (self.inst.signed_imm << 16) as u32 as _
+    );
+
+    CompileInstructionResult::Continue
+}
+
