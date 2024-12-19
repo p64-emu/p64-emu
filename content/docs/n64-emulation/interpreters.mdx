@@ -1,0 +1,49 @@
+---
+title: Interpreters
+description: What are we really interpreting?
+---
+import { CodeBlock } from "fumadocs-ui/components/codeblock"
+
+Interpreters are functions that we write in our programming langage without a requirement of them to be compiled into machine code.
+
+We can take a function like SWV to see the interpreted code
+
+```rust
+fn swv(n64: &mut N64, opcode: u32) {
+    // Calculate the base address by adding the sign-extended offset to the base register value
+    let base_address = n64.rsp.registers.gpr[rs(opcode) as usize]
+          .wrapping_add(sign_extend_7bit_offset(voffset(opcode), 4));
+
+    // Determine the starting element in the vector register
+    let start_element = velement(opcode);
+
+    // Calculate the initial base address offset within an 8-byte boundary
+    let initial_base = base_address & 7;
+
+    // Align the base address to the nearest 8-byte boundary
+    let aligned_address = base_address & ADDR_ALIGN_MASK;
+
+    // Get the vector register index from the Operation Code
+    let vpr_register = rt(opcode) as usize;
+
+    // Iterate over each element in the vector
+    (0..ELEMENT_COUNT).for_each(|offset| {
+        // Calculate the current element index
+        let current_element = start_element + offset;
+
+        // Calculate the current base address offset
+        let current_base = initial_base.wrapping_add(offset as u32);
+
+        // Calculate the memory address to store the byte
+        let mem_addr = ((aligned_address + (current_base & BASE_MASK)) & ADDR_MASK) as usize;
+
+        // Store the byte from the vector register to memory
+        n64.rsp.memory.mem[mem_addr] = get_vpr_byte(n64.rsp.registers.vpr[vpr_register], current_element);
+    });
+}
+```
+
+## But, How do you know what to execute?
+During the process of reading the source code, one instruction at a time, each instruction is decoded through the Opcode and then executed immediately.
+
+And through this, can get the needed instruction and execute the function that is mapped to the original location.
