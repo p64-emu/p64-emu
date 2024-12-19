@@ -1,0 +1,34 @@
+---
+title: What is an Emulator?
+description: It sounds hard? Is it...?
+---
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+All that emulators are are translating the code that the console was understanding, this could be MIPS, PowerPC, and other instruction set architectures, into something your modern computer can execute.
+
+The role of an emulator is to recreate the behavior of one computer system (the "guest" system, like a Nintendo 64) on another computer system (the "host" system, like your PC). It does this by:
+
+In development this means a couple of things;
+
+<Steps>
+  <Step>
+    ## Understand How Memory is Mapped Out
+    Instructions in consoles are mapped to specific memory addresses and to be able to emulate a console, we need to replicate those memory locations with our right locations. 
+    For Example [Ultra64](https://ultra64.ca/files/tools/DETAILED_N64_MEMORY_MAP.txt) has a detailed mapping of the Nintendo 64's Memory.
+  </Step>
+  <Step>
+    ## Translate Instructions from Foreign Architecture Code to Native Machine Code
+    An Emulator must translate instructions from the original console's architecture to code that can run on modern computers. For the Nintendo 64, this means converting MIPS R4300i instructions into x86 or ARM code that your computer can understand. For example, the [MIPS](https://www.copetti.org/writings/consoles/nintendo-64) (Thanks Copetti!) instruction set documentation shows the architecture of the Nintendo 64.
+  </Step>
+  <Step>
+    ## Emulate the Graphics
+    Console graphics hardware needs to be simulated in software to accurately display the games as you would see them on your Television. The Nintendo 64's has it's own Reality Display Processor (RDP) which performs the 3D operations. This, for example, must be converted to modern graphics APIs like [OpenGL](https://www.opengl.org/) or [Vulkan](https://www.vulkan.org). The [RetroReversing RDP Wiki Page](https://www.retroreversing.com/n64rdp) contains detailed specifications for these graphics operations.
+  </Step>
+  <Step>
+    ## Emulate the Input
+    The link between controllers and peripherals is software emulation. The Nintendo 64 controller protocol needs to be implemented to handle input polling, button states, and analog stick positions. Tools like [Controller Pak](https://n64brew.dev/wiki/Controller_Pak) documentation help understand how the input system was in 1996.
+  </Step>
+</Steps>
+
+## That's It!
+That is what it takes to make an emulator, it definetly takes a good amount of time procuring the right amount of information but mostly everything related to the Nintendo 64 or the console of your choice will have ample documentation and it's the job of the developer to use that to make the finished Emulator.
