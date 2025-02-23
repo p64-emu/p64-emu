@@ -1,0 +1,52 @@
+---
+title: Memory Map
+description: Understanding the Nintendo 64's memory layout
+---
+
+import { Callout } from "fumadocs-ui/components/callout"
+
+The Nintendo 64's memory map is key to developing an emulator, as it shows how memory is organized and utilized throughout the system.
+
+## Memory Segments
+
+The system's memory is divided into several segments:
+
+| Region           | Start Address | End Address | Size   | Description                          |
+|------------------|---------------|-------------|--------|--------------------------------------|
+| RDRAM            | 0x00000000   | 0x03FFFFFF | 4-8MB  | Main system memory                   |
+| RDRAM Registers  | 0x03F00000   | 0x03FFFFFF | 1MB    | Memory-mapped hardware registers     |
+| SP DMEM          | 0x04000000   | 0x04000FFF | 4KB    | Data memory for the RSP              |
+| SP IMEM          | 0x04001000   | 0x04001FFF | 4KB    | Instruction memory for the RSP       |
+| SP Registers     | 0x04040000   | 0x0404FFFF | 64KB   | Control registers for the RSP        |
+| DP Command       | 0x04100000   | 0x041FFFFF | 1MB    | Command registers for the RDP        |
+| DP Span          | 0x04200000   | 0x042FFFFF | 1MB    | Span registers for the RDP           |
+| MIPS Interface   | 0x04300000   | 0x043FFFFF | 1MB    | Interface registers for the MIPS CPU |
+| Video Interface  | 0x04400000   | 0x044FFFFF | 1MB    | Video interface registers            |
+| Audio Interface  | 0x04500000   | 0x045FFFFF | 1MB    | Audio interface registers            |
+| PI Interface     | 0x04600000   | 0x046FFFFF | 1MB    | Peripheral interface registers       |
+| RI Interface     | 0x04700000   | 0x047FFFFF | 1MB    | Interface registers for RDRAM        |
+| SI Interface     | 0x04800000   | 0x048FFFFF | 1MB    | Serial interface registers           |
+| CartROM          | 0x10000000   | 0x1FBFFFFF | 252MB  | Cartridge ROM                        |
+| PIF ROM          | 0x1FC00000   | 0x1FC007BF | 2KB    | Boot ROM                             |
+| PIF RAM          | 0x1FC007C0   | 0x1FC007FF | 64B    | Controller and EEPROM interface      |
+
+<Callout title="Important Note">
+  The addresses listed above are physical addresses. The Nintendo 64 uses a Translation Lookaside Buffer (TLB) to convert these physical addresses into virtual ones during operation.
+</Callout>
+
+## Memory Access
+
+Access to memory on the Nintendo 64 is managed by various controllers:
+
+- **RI (RDRAM Interface):** Oversees access to the main memory.
+- **MI (MIPS Interface):** Handles operations related to the CPU.
+- **PI (Peripheral Interface):** Manages memory access for cartridges and other peripherals.
+- **SI (Serial Interface):** Controls communication with controllers and EEPROMs.
+
+## Virtual Memory
+
+The Nintendo 64’s MIPS R4300i CPU uses virtual memory with the following characteristics:
+
+- It supports 32 TLB entries.
+- Page sizes range from 4KB to 16MB.
+- Both the virtual and physical address spaces are 4GB in size.
